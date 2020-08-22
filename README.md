@@ -1,5 +1,8 @@
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+Version 1.0 Demo
+![image](https://github.com/ChazLee001/ReactTodoList/blob/master/PeekDemo0821TodoList.gif)
+
 ## Available Scripts
 
 In the project directory, you can run:

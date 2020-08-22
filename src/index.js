@@ -1,17 +1,102 @@
-import React from 'react';
+import React, { Component } from 'react';
+import { BrowserRouter as Router, Route } from 'react-router-dom'
+
 import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import * as serviceWorker from './serviceWorker';
+import Header from './components/layout/Header';
+import Todos from './components/Todos';
+import './App.css';
+import AddTodo from './components/AddTodo';
+import About from './components/pages/About';
+//import {v4 as uuid} from 'uuid';
+import axios from 'axios';
 
-ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById('root')
-);
+class App extends Component {
+  // state = {
+  //   todos: [
+  //     {
+  //       id: uuid(),
+  //       title: 'Take out the trash',
+  //       completed: false
+  //     },
+  //     {
+  //       id: uuid(),
+  //       title: 'Dinner with wife',
+  //       completed: true
+  //     },
+  //     {
+  //       id: uuid(),
+  //       title: 'Leetcode',
+  //       completed: false
+  //     },
+  //   ]
+  // }
+  state = {
+    todos: []
+  }
+  componentDidMount() {
+    axios.get('https://jsonplaceholder.typicode.com/todos?_limit=10').then(
+      res => this.setState({ todos: res.data })
+    )
+  }
+  
+  markComplete=(id) => {
+    this.setState({ todos: this.state.todos.map(todo => {
+      if (todo.id === id) {
+        todo.completed = !todo.completed;
+      }
+      return todo;
+    }) });
+  }
 
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://bit.ly/CRA-PWA
-serviceWorker.unregister();
+  // delTodo=(id) => {
+  //   this.setState({ todos: [...this.state.todos.filter(todo => todo.id !== id)] });
+  // }
+//local add
+  // addTodo= (title) => {
+  //   const newTodo = {
+  //     id: uuid(),
+  //     title,
+  //     completed: false
+  //   }
+  //   this.setState({ todos: [...this.state.todos, newTodo] });
+  // }
+
+  delTodo=(id) => {
+    axios.delete('https://jsonplaceholder.typicode.com/todos/${id}').then(
+      res => this.setState({ todos: [...this.state.todos.filter(todo => todo.id !== id)] })
+    );
+  }
+
+  //add to jason place holder
+  addTodo= (title) => {
+    axios.post('https://jsonplaceholder.typicode.com/todos',  {
+      title,
+      completed: false
+    }).then(res => this.setState({ todos:
+    [...this.state.todos, res.data] }));
+  }
+
+  render() {
+    //console.log(this.state.todos)
+    return (
+      <Router>
+        <div className="App">
+          <div className="container">
+            <Header />
+            <Route exact path="/" render={props => (
+              <React.Fragment>
+                <AddTodo addTodo={this.addTodo}/>
+                <Todos todos={this.state.todos} markComplete={this.markComplete} delTodo={this.delTodo}/>
+              </React.Fragment>
+            )} />
+            <Route path="/about" component={About} />
+          </div>
+        </div>
+      </Router>
+    );
+  }
+}
+
+ReactDOM.render(<App />, document.getElementById('root'));
+
+export default App;
